@@ -111,8 +111,11 @@ func (a *AuthController) Login(c *gin.Context) {
 	// send OTP email (non-blocking)
 	go func() {
 		if a.email != nil {
+			fmt.Printf("[OTP EMAIL] FROM: %s TO: %s\n", a.email.From, email)
 			body := fmt.Sprintf("Hello %s,\n\nYour OTP for login is: %s\nThis OTP will expire in %d minutes.\n\nIf you didn't request this, ignore.", user.FullName, otp, ttlMin)
-			_ = a.email.Send(email, "Your login OTP", body)
+			if err := a.email.Send(email, "Your login OTP", body); err != nil {
+				fmt.Printf("[OTP EMAIL ERROR] %v\n", err)
+			}
 		}
 	}()
 
